@@ -2,7 +2,13 @@
 
 # Protobuf Quick Start
 
+github地址:https://github.com/pleasewhy/protobuf-demo
+
 该教程的环境为centos-tLinux 2.2-集成版
+
+目录：
+
+[TOC]
 
 ## 1、protobuf 安装
 
@@ -34,6 +40,19 @@ protoc --version
 ```
 
 查看链接库位置
+
+```shell
+pkg-config --cflags --libs protobuf
+# -pthread  -lprotobuf -lpthread
+```
+
+若果你运行这段命令发生错误，你可以需要缺少相应的环境变量，你可以添加如下的环境变量
+
+```shell
+export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/lib/pkgconfig"
+```
+
+
 
 ## 2、Protocol Buffer语法
 
