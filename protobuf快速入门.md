@@ -8,7 +8,20 @@ github地址:https://github.com/pleasewhy/protobuf-demo
 
 目录：
 
-[TOC]
+- [Protobuf Quick Start](#protobuf-quick-start)
+  * [1、protobuf 安装](#1-protobuf---)
+  * [2、Protocol Buffer语法](#2-protocol-buffer--)
+    + [2.1 定义消息类型](#21-------)
+    + [2.2 分配Field Numbers](#22---field-numbers)
+    + [2.3 指定字段规则](#23-------)
+    + [2.4 添加更多的消息](#24--------)
+    + [2.5 注释](#25---)
+    + [2.6 保留字段](#26-----)
+    + [2.7 编译.proto文件](#27---proto--)
+    + [2.8 默认值](#28----)
+    + [2.9 枚举](#29---)
+    + [2.10 使用其他消息类型](#210---------)
+  * [3、示例程序](#3-----)
 
 ## 1、protobuf 安装
 
