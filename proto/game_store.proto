@@ -1,0 +1,31 @@
+syntax = "proto3"; // 若不指定，默认为 proto2
+package protobuf;
+
+//
+// 命名规则：
+// message: 驼峰命名
+// message字段: 下划线命名
+// enum: 驼峰
+// enum字段: 大写_下划线_大写
+//
+
+message Game {
+	int32 game_id = 1;
+	string name = 2;
+	double price = 3;
+
+	enum Type {
+    ROLE_PLAY = 0;
+    MOBA = 1;
+    FPS = 2;
+  }
+	Type type = 4;
+}
+
+message User {
+  string username = 1;
+  string password = 2;
+  int32 user_id = 3;
+	uint32 age = 4;
+  repeated Game own_games = 5;
+}
