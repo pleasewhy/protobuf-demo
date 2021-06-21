@@ -1,3 +1,5 @@
+# 对于没有依赖的target，需要将其
+# 指明为伪目标
 .PHONY: clean clean-proto
 
 # make默认执行的target为第一个target

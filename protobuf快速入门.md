@@ -67,7 +67,7 @@ export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/lib/pkgconfig"
 
 
 
-## 2、Protocol Buffer语法
+## 2、Protocol Buffer3语法
 
 本小节翻译自[proto3 官方文档](https://developers.google.com/protocol-buffers/docs/proto3)
 
@@ -87,7 +87,9 @@ message SearchRequest {
 }
 ```
 
-​	`SearchRequest` 定义了3个字段(键值对)，分别对应你想要添加到`SearchRequest` 的数据。每个字段都包含一个name和类型
++ 在第一行非空白非注释行，必须指明版本，如不指定默认为proto2
+
++ `SearchRequest` 定义了3个字段(键值对)，分别对应你想要添加到`SearchRequest` 的数据。每个字段都包含一个name和类型
 
 ​	在上面的例子中，所有字段都是[scalar类型](https://developers.google.com/protocol-buffers/docs/proto3#scalar): 两个int类型(`page_number`和`result_per_page`)和一个string类型(`query`)。当然，你也可以使用符合类型，例如:[枚举](https://developers.google.com/protocol-buffers/docs/proto3#enum)和其他消息类型。
 
@@ -101,8 +103,8 @@ message SearchRequest {
 
 消息字段能够使用下面两条规则中的一条
 
-+ singular:  符合该规则的字段，可以出现0次或者一次(但是不能出现两次及以上)。proto3中字段默认为singular。
-+ `repeated`: 符合改规则的字段，可以重复任意次(包括0)，重复值的顺序会被保留。
++ `singular`:  符合该规则的字段，可以出现0次或者一次(但是不能出现两次及以上)。proto3中字段默认为singular。
++ `repeated`: 符合该规则的字段，可以重复任意次(包括0)，重复值的顺序会被保留。
 
 proto3中，`repeated`修饰的字段默认会使用`packed`进行编码。通俗的来讲，repeated就是允许发送数组。
 
@@ -253,6 +255,47 @@ message Result {
 }
 ```
 
+### 2.11 proto2和proto3的区别
+
+​	若不在`.proto`文件中指定protobuf版本，那么默认为proto2.
+
+​	proto2和proto3在语法层面上大致相同，但是仍然有一些地方有着明显的差异.
+
++ 字段规则
+
+  在proto2有三种规则
+
+  ​	**required**：符合该规则的字段，只能恰好出现一次。
+
+  ​	**optional**：符合该规则的字段，可以出现 1次或者0次。
+
+  ​	**repeated**：和proto3一致 
+
+  proto3中删除了`require`规则，并将`optional`替换为`singular`。
+
++ 默认值
+
+  在proto2中你可以通过下面的方式来指定字段的默认值，但在proto3中不可以这样用
+
+  ```protobuf
+  optional int32 result_per_page = 3 [default = 10];
+  ```
+
++ 支持语言
+
+  proto2支持`C++`，`Java`，`Python`
+
+  proto3支持`C++`，`Java`，`Python`，`Kotlin`，`Go`，`Ruby`，`ObjectC`，`C#`，`Php`
+
++ repeated编码
+
+  在proto3中默认采用[packed](https://developers.google.com/protocol-buffers/docs/encoding#packed)的方式进行编码，proto2中由于历史原因默认采用低效的编码方式，你向需要下面手动指定：
+
+  ```protobuf
+  repeated int32 samples = 4 [packed=true];
+  repeated ProtoEnum results = 5 [packed=true];
+  ```
+
 ## 3、示例程序
 
 ### 3.1 简介
@@ -310,7 +353,51 @@ run: test.cpp
 	test
 ```
 
-​	现在你就可以`make run`来编译并运行你的代码了。简单的来说Makefile就这些功能，可以在[这里](https://seisman.github.io/how-to-write-makefile/introduction.html)学习更多关于Makefile的知识。
+​	现在你就可以`make run`来编译并运行你的代码了。简单的来说Makefile就这些功能，你可以在[这里](https://seisman.github.io/how-to-write-makefile/introduction.html)学习更多关于Makefile的知识。
+
+​	对于示例程序来说，上面提到的这些东西就已经足够了，示例程序的makefile如下。
+
+```makefile
+# 对于没有依赖的target，需要将其
+# 指明为伪目标
+.PHONY: clean clean-proto
+
+# make默认执行的target为第一个target
+# 可以通过.DEFAULT_GOAL修改
+.DEFAULT_GOAL := run
+
+# 获取protobuf静态链接库的位置
+LINK_LIB := `pkg-config --cflags --libs protobuf`
+
+
+proto_dir = ./proto
+proto_cpp_file = $(proto_dir)/game_store.pb.cc
+cpp_file = main.cpp
+
+# 编译.proto文件
+# $^代表冒号右边匹配到的文件,即requirement
+# $@代表冒号左边匹配到的文件,即target
+%.pb.cc: %.proto
+	protoc --cpp_out=. $^ 
+
+# 运行test target 需要game_store.pb.cc和main.cpp
+# 如果这两个文件没有被修改过,那么该target的command
+# 不会被执行
+test: $(proto_cpp_file) $(cpp_file)
+	g++ -std=c++11 $(cpp_file) $(proto_cpp_file) -I. -o test $(LINK_LIB)
+
+run: test
+	./test
+
+clean:
+	rm test
+
+clean-proto:
+	rm $(proto_dir)/*.pb.cc \
+		 $(proto_dir)/*.pb.h
+```
+
+### 3.3 code
 
 ​	用户相关信息定义如下：
 
