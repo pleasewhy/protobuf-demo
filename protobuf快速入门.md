@@ -59,7 +59,7 @@ pkg-config --cflags --libs protobuf
 # -pthread  -lprotobuf -lpthread
 ```
 
-若果你运行这段命令发生错误，你可以需要缺少相应的环境变量，你可以添加如下的环境变量
+若果你运行这段命令发生错误，你可能缺少相应的环境变量，你可以添加如下的环境变量
 
 ```shell
 export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/lib/pkgconfig"
@@ -255,7 +255,9 @@ message Result {
 
 ## 3、示例程序
 
-github 地址: 
+### 3.1 简介
+
+​	github 地址: https://github.com/pleasewhy/protobuf-demo
 
 ​	现在让我们用`Makefile`和`protobuf`来实现一个简单的程序。这个示例程序简单的使用多进程：一个进程作为client、一个进程作为server，还有管道用于这两个进程之间的通信，为了降低复杂性并不会使用锁来控制并发操作，其大致的运行流程如下图：
 
@@ -264,6 +266,51 @@ github 地址:
 ​	![image-20210620224210229](img\image-20210620224210229.png)
 
 ​	该程序的功能只有一个就是通过userID查询用户信息，从而打印用户的游戏拥有情况和购买游戏花费的钱。
+
+### 3.2 Makefile
+
+​	首先要知道Makefile的作用是什么，搞清楚了这个就能够很快的理解Makefile了。
+
+​	如果你想在linux编译一个C++文件，你可能会下面下面这样做
+
+```shell
+g++ -o test test.cpp
+```
+
+​	如果你这个文件的代码需要经常修改的话，那么每次运行代码都需要输入上面的命令，非常麻烦。特别是当你需要需要编译的文件很多的时候，这样重复的输入是很繁琐的。Makefile的大致作用就是将这些需要重复输入的命令记录下来，并允许你使用更短的命令来执行。
+
+​	现在让我们来看看Makefile文件的编写规则
+
+```makefile
+target: prerequisites ...
+	command
+	...
+	...
+```
+
+​	**target**
+
+​		target通常来说是一个文件，但是也可以是一个标签
+
+​	**prerequisites**
+
+​		该target所依赖的文件或者其他target，多个prerequisites之前使用空格隔开
+
+​	**command**
+
+​		该target需要执行的命令
+
+​	当你要执行某个target的时候，你可以运行`make xxxtarget`，就可以运行对于target的command序列了，并且在运行之前会运行prerequisites对应的target，如果prerequisites不存在，那么就会运行失败。
+
+​	你可以在你的工作目录里面添加一个名为Makefile或者makefile的文件，并加入下面的内容
+
+```makefile
+run: test.cpp
+	g++ -o test test.cpp
+	test
+```
+
+​	现在你就可以`make run`来编译并运行你的代码了。简单的来说Makefile就这些功能，可以在[这里](https://seisman.github.io/how-to-write-makefile/introduction.html)学习更多关于Makefile的知识。
 
 ​	用户相关信息定义如下：
 
